@@ -1,9 +1,21 @@
-<<<<<<< HEAD
 # GCP NYC Taxi Data Lake
 
 ## Overview
 
 This project outlines a robust and scalable data pipeline for ingesting, processing, and analyzing NYC Taxi data on Google Cloud Platform (GCP). Designed with best practices for data lakes, the pipeline automates monthly data collection, efficient storage in Parquet format, and transformation into curated datasets for advanced analytics and business intelligence using Looker Studio. This project demonstrates proficiency in cloud data engineering, Big Data processing, and data visualization.
+
+## Architecture
+
+The following diagram illustrates the high-level architecture of the NYC Taxi Data Lake pipeline:
+
+![NYC Taxi Data Lake Architecture](architecture/architecture.png)
+
+The architecture consists of several key components:
+1. Monthly trigger via Cloud Scheduler and Cloud Function
+2. Data ingestion pipeline using Cloud Functions
+3. Raw data storage in Google Cloud Storage
+4. Data processing and transformation using BigQuery
+5. Analytics and visualization using Looker Studio
 
 ## Setup and Prerequisites
 
@@ -94,7 +106,7 @@ gcloud functions deploy monthly-trigger \
     --runtime python39 \
     --trigger-http \
     --entry-point monthly_trigger \
-    --region us-central1 \
+    --region asia-south1 \
     --allow-unauthenticated # Or configure appropriate authentication for production
 ```
 *Note the `--trigger-http` flag and `--allow-unauthenticated` for simpler testing. For production, ensure proper authentication (e.g., IAM roles) is configured.*
@@ -104,10 +116,10 @@ Create the Cloud Scheduler job to trigger the deployed Cloud Function.
 ```bash
 gcloud scheduler jobs create http monthly-taxi-data-trigger \
     --schedule "0 0 1 * *" \
-    --uri="$(gcloud functions describe monthly-trigger --region us-central1 --format='value(httpsTrigger.url)')" \
+    --uri="$(gcloud functions describe monthly-trigger --region asia-south1 --format='value(httpsTrigger.url)')" \
     --http-method=POST \
     --oauth-service-account-email="your-service-account@your-gcp-project-id.iam.gserviceaccount.com" \
-    --time-zone "America/New_York" \
+    --time-zone "Asia/Kolkata" \
     --message-body "{}"
 ```
 *Replace `your-service-account@your-gcp-project-id.iam.gserviceaccount.com` with a service account that has `roles/cloudfunctions.invoker` permission on the `monthly-trigger` Cloud Function and `roles/pubsub.publisher` on the `trigger-nyc-pipeline` topic.*
@@ -209,7 +221,7 @@ gcloud functions deploy download-and-upload-parquet \
     --runtime python39 \
     --trigger-topic nyc-taxi-data-stream \
     --entry-point pubsub_trigger \
-    --region us-central1 \
+    --region asia-south1 \
     --memory 256MB \
     --timeout 300s \
     --service-account="your-service-account@your-gcp-project-id.iam.gserviceaccount.com"
@@ -221,13 +233,13 @@ gcloud functions deploy download-and-upload-parquet \
 
 ### 5. GCS Raw Zone (Google Cloud Storage Bucket)
 
-**Explanation:** The `nyc-taxi-datalake-project` Google Cloud Storage bucket serves as the foundational "Raw Zone" of the data lake. It is the primary landing area for all raw Parquet files downloaded by the ingestion pipeline. This bucket is configured for regional storage (e.g., `us-central1`) to balance durability and cost-effectiveness. The raw zone is critical for maintaining an immutable, versioned record of all ingested data, providing a single source of truth before any transformations occur. This design supports re-processing capabilities and adheres to data lake principles.
+**Explanation:** The `nyc-taxi-datalake-project` Google Cloud Storage bucket serves as the foundational "Raw Zone" of the data lake. It is the primary landing area for all raw Parquet files downloaded by the ingestion pipeline. This bucket is configured for regional storage (e.g., `asia-south1`) to balance durability and cost-effectiveness. The raw zone is critical for maintaining an immutable, versioned record of all ingested data, providing a single source of truth before any transformations occur. This design supports re-processing capabilities and adheres to data lake principles.
 
 **Example Command (Create GCS Bucket):**
 ```bash
-gsutil mb -l us-central1 gs://nyc-taxi-datalake-project
+gsutil mb -l asia-south1 gs://nyc-taxi-datalake-project
 ```
-*Replace `us-central1` with the GCP region where you want to store your data.*
+*Replace `asia-south1` with the GCP region where you want to store your data.*
 
 **Screenshot:** A screenshot of the `nyc-taxi-datalake-project` GCS bucket in the GCP Console, showing its configuration and some of the uploaded raw Parquet files.
 ![GCS Raw Zone Screenshot](screenshots/gcs_raw_zone.png)
@@ -412,7 +424,7 @@ Follow these steps to set up and deploy the GCP NYC Taxi Data Lake pipeline:
 2.  **Google Cloud Storage (GCS) Bucket Creation**:
     *   Create the `nyc-taxi-datalake-project` GCS bucket, which will serve as your raw data zone.
         ```bash
-        gsutil mb -l us-central1 gs://nyc-taxi-datalake-project
+        gsutil mb -l asia-south1 gs://nyc-taxi-datalake-project
         ```
     *   **Screenshot:** ![Creating GCS Bucket](screenshots/05-creating-gcs-bucket.png)
 
@@ -465,7 +477,3 @@ Follow these steps to set up and deploy the GCP NYC Taxi Data Lake pipeline:
 ## Links
 
 *   **Looker Studio Dashboard**: [NYC Taxi Data Analysis Dashboard](https://lookerstudio.google.com/reporting/90336218-d404-49a3-9490-4f1463042457)
-*   **ChatGPT Reference (for conceptual discussions/ideas during development)**: [ChatGPT Conversation](https://chatgpt.com/share/684d6798-546c-8004-a134-9cb576fed1c6)
-=======
-# gcp-data-lake-nyc-taxi
->>>>>>> e829e47ac99fd6bf9e10a52902e0b49f1da97314
