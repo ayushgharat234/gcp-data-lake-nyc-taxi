@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # GCP NYC Taxi Data Lake
 
 ## Overview
@@ -465,7 +464,3 @@ Follow these steps to set up and deploy the GCP NYC Taxi Data Lake pipeline:
 ## Links
 
 *   **Looker Studio Dashboard**: [NYC Taxi Data Analysis Dashboard](https://lookerstudio.google.com/reporting/90336218-d404-49a3-9490-4f1463042457)
-*   **ChatGPT Reference (for conceptual discussions/ideas during development)**: [ChatGPT Conversation](https://chatgpt.com/share/684d6798-546c-8004-a134-9cb576fed1c6)
-=======
-# gcp-data-lake-nyc-taxi
->>>>>>> e829e47ac99fd6bf9e10a52902e0b49f1da97314
